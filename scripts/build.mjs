@@ -8,6 +8,7 @@ const dist=join(root,'dist');
 await rm(dist,{recursive:true,force:true});await mkdir(dist,{recursive:true});
 await writeFile(join(dist,'index.html'),render());
 await copyFile(join(root,'src/styles.css'),join(dist,'styles.css'));
+await copyFile(join(root,'src/state.mjs'),join(dist,'state.mjs'));
 const app=await readFile(join(root,'src/app.js'),'utf8');
 await writeFile(join(dist,'app.js'),`window.PROPOSAL_COPY=${JSON.stringify(copy).replaceAll('<','\\u003c')};\n${app}`);
 await cp(join(root,'public'),dist,{recursive:true});
