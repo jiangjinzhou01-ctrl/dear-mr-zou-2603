@@ -1,0 +1,17 @@
+import {rm,mkdir,writeFile,copyFile,cp,stat,readFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {join} from 'node:path';
+import {render} from '../src/template.mjs';
+import {copy} from '../src/content.mjs';
+const root=fileURLToPath(new URL('..',import.meta.url));
+const dist=join(root,'dist');
+await rm(dist,{recursive:true,force:true});await mkdir(dist,{recursive:true});
+await writeFile(join(dist,'index.html'),render());
+await copyFile(join(root,'src/styles.css'),join(dist,'styles.css'));
+const app=await readFile(join(root,'src/app.js'),'utf8');
+await writeFile(join(dist,'app.js'),`window.PROPOSAL_COPY=${JSON.stringify(copy).replaceAll('<','\\u003c')};\n${app}`);
+await cp(join(root,'public'),dist,{recursive:true});
+await writeFile(join(dist,'.nojekyll'),'');
+const sizes=await Promise.all(['index.html','styles.css','app.js'].map(async name=>[name,(await stat(join(dist,name))).size]));
+console.log('Built dist/ successfully. All resource URLs are relative.');
+sizes.forEach(([name,size])=>console.log(`${name}: ${(size/1024).toFixed(1)} KiB`));
