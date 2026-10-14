@@ -63,4 +63,33 @@ test('all editable text has Chinese and English, with no invented metrics',()=>{
 test('deployment resources exist and work from a GitHub repository subpath',async()=>{
   const html=render(),css=await readFile(new URL('../src/styles.css',import.meta.url),'utf8');
   const paths=[...[...html.matchAll(/(?:href|src)="(\.\/[^"#]+)"/g)].map(x=>x[1]),...[...css.matchAll(/url\('(\.\/[^']+)'\)/g)].map(x=>x[1])];
-  for(const path of paths){const expected=path==='./styles.css'?'../src/styles.css':path==='./app.js'?'../src/app.js':'../public/'+path.slice(2);assert.ok((await stat(new URL(expected,import.meta.url))).size>0,path
+  for(const path of paths){const expected=path==='./styles.css'?'../src/styles.css':path==='./app.js'?'../src/app.js':'../public/'+path.slice(2);assert.ok((await stat(new URL(expected,import.meta.url))).size>0,path);assert.ok(new URL(path,'https://example.github.io/dear-mr-zou/').pathname.startsWith('/dear-mr-zou/'));}
+  assert.ok(!/https?:\/\//.test(source),'no runtime network calls');
+});
+test('opening transitions into chapter 01 in reduced motion mode',async()=>{
+  const f=fixture();await f.node('#open-proposal').emit('click');assert.equal(f.node('#who').scrolled.block,'start');assert.equal(f.node('#open-proposal').disabled,false);
+});
+test('cinematic opening cleans up and preserves future replay',async()=>{
+  const f=fixture({reduced:false});await f.node('#open-proposal').emit('click');assert.ok(f.document.documentElement.classList.contains('opening'));f.runTimers();assert.equal(f.node('#open-proposal').disabled,false);assert.ok(!f.document.documentElement.classList.contains('opening'));
+});
+test('all three terms can be revised and restored using click',async()=>{
+  const f=fixture();for(const row of f.many['.revision-row']){const button=row.children['.revision-button'];await button.emit('click');assert.equal(button.attrs['aria-expanded'],'true');assert.equal(row.children['.revision-note'].hidden,false);await button.emit('click');assert.equal(row.children['.revision-note'].hidden,true);assert.equal(button.attrs['aria-expanded'],'false');}
+});
+test('four reader interactions reveal all lines and the greeting, then visit the proposal',async()=>{
+  const f=fixture();for(let i=0;i<4;i++)await f.node('#conversation-next').emit('click');assert.ok(f.many['.conversation-line'].every(x=>!x.hidden));assert.equal(f.node('#hello-message').hidden,false);await f.node('#conversation-next').emit('click');assert.ok(f.node('#proposal').scrolled);
+});
+test('beginning is a complete ceremony, replay resets every narrative state',async()=>{
+  const f=fixture();await f.many['.revision-button'][0].emit('click');await f.node('#conversation-next').emit('click');await f.node('#begin-chapter').emit('click');assert.equal(f.node('#begin-chapter').disabled,true);f.runTimers();assert.ok(f.node('#beginning').scrolled);assert.match(f.node('#begin-status').textContent,/已送达/);await f.node('#replay').emit('click');assert.equal(f.node('#begin-status').textContent,'');assert.equal(f.node('#begin-chapter').disabled,false);assert.equal(f.many['.conversation-line'][1].hidden,true);assert.equal(f.many['.revision-row'][0].children['.revision-note'].hidden,true);assert.ok(f.node('#document').scrolled);
+});
+test('language changes in place even when localStorage is blocked',async()=>{
+  const f=fixture({storageBlocked:true});await f.node('#language-toggle').emit('click');assert.equal(f.document.documentElement.lang,'en');await f.node('#language-toggle').emit('click');assert.equal(f.document.documentElement.lang,'zh-CN');
+});
+test('chapter index closes via Escape and native dialogs open and close',async()=>{
+  const f=fixture();await f.node('#chapter-toggle').emit('click');assert.equal(f.node('#chapter-menu').hidden,false);await f.document.emit('keydown',{key:'Escape'});assert.equal(f.node('#chapter-menu').hidden,true);for(let i=0;i<3;i++){await f.many['[data-dialog]'][i].emit('click');const dialog=f.many['.note-dialog'][i];assert.equal(dialog.open,true);await dialog.children['.dialog-close'].emit('click');assert.equal(dialog.open,false);}
+});
+test('unsupported audio returns a readable message without enabling sound',async()=>{
+  const f=fixture();await f.node('#sound-toggle').emit('click');assert.equal(f.node('#sound-toggle').attrs['aria-pressed'],'false');assert.equal(f.node('#sound-toggle').disabled,false);assert.ok(f.node('#announcer').textContent.includes('声音'));
+});
+test('responsive and reduced-motion fallbacks are explicitly present',async()=>{
+  const css=await readFile(new URL('../src/styles.css',import.meta.url),'utf8');for(const breakpoint of ['max-width:767px','max-width:359px','max-width:1023px','min-width:1800px'])assert.ok(css.includes(breakpoint));assert.ok(css.includes('prefers-reduced-motion:reduce'));assert.ok(css.includes('safe-area-inset-bottom'));assert.ok(!css.includes('overflow:hidden}body'));assert.ok(!source.includes("addEventListener('scroll'"));
+});

@@ -51,4 +51,21 @@ export const copy = {
   beginning: ['新章节正在展开', 'A new chapter is opening'],
   begun: ['第一句问候，已送达。', 'Our first hello has arrived.'],
   ending: ['邹老师，\n接下来的故事，\n就从这里开始吧。', 'Mr. Zou,\nlet’s begin\nthe story from here.'],
-  closing: ['谨致问候，2603班', 'With war
+  closing: ['谨致问候，2603班', 'With warm regards, Class 2603'],
+  replay: ['重新阅读', 'Read again'],
+  future: ['留给以后的话', 'A message for later'],
+  futureTitle: ['TO BE CONTINUED.', 'TO BE CONTINUED.'],
+  futureBody: ['这一页，先留白。\n等我们真的有了新的故事，再回来写。', 'We’ll leave this page open.\nWhen we have a real story to tell, we’ll come back and write it.'],
+  close: ['收起', 'Close'],
+  chapterNav: ['章节目录', 'Chapter index'],
+  chapterNames: ['封面 / 认识我们 / 文书背后 / 第一次对话 / 我们的提案 / 从这里开始', 'The document / Who we are / Behind the document / The first conversation / Our proposal / Shall we begin'],
+};
+export const revisions = [
+  {formal:'Strategic Partnership', honest:'Getting to know each other.', key:'revision01', note:'revisionNote01'},
+  {formal:'Performance Objectives', honest:'Learning together.', key:'revision02', note:'revisionNote02'},
+  {formal:'Communication Protocol', honest:'Let’s talk.', key:'revision03', note:'revisionNote03'},
+];
+export const proposal = [
+  {title:'Communication',key:'communication'}, {title:'Curiosity',key:'curiosity'},
+  {title:'Mutual Respect',key:'respect'}, {title:'The Unexpected',key:'unexpected'},
+];
